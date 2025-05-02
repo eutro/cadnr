@@ -1,7 +1,9 @@
 #lang racket/base
 
 (require "support.rkt"
-         (for-syntax racket/base))
+         (for-syntax racket/base
+                     racket/match
+                     "numerics.rkt"))
 
 (provide define-default-cadnr-top)
 
@@ -33,4 +35,27 @@
   [#px"pre(d+)" (_ ds)
    #`(lambda (x) (- x #,(string-length ds)))]
   [#px"sub(\\d+)" (_ n)
-   #`(lambda (x) (- x #,(string->number n)))])
+   #`(lambda (x) (- x #,(string->number n)))]
+
+  [(app (λ (it) (words->number it)) (list pfx n sfx))
+   (=> fail)
+   (match* {pfx sfx}
+     [{"" ""} #`#,n]
+     [{"" "?"} #`(lambda (n) (= n #,n))]
+     [{_ _} (fail)])]
+
+  [(and name (app (λ (it) (words->number it #:ordinal? #t)) (list pfx n sfx)))
+   (=> fail)
+   (with-syntax ([n* (sub1 n)]
+                 [name-sym (string->symbol name)])
+     (match* {pfx sfx}
+       [{"" ""}
+        #`(lambda (ls)
+            (unless (list? ls) (raise-argument-error 'name-sym "list?" ls))
+            (list-ref ls n*))]
+       [{"sequence-" ""}
+        #`(lambda (s)
+            (local-require racket/sequence)
+            (unless (sequence? s) (raise-argument-error 'name-sym "sequence?" s))
+            (sequence-ref s n*))]
+       [{_ _} (fail)]))])
