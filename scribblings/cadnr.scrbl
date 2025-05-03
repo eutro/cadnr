@@ -3,14 +3,39 @@
                     cadnr/defaults
                     racket/list
                     racket/sequence
+                    racket/string
                     (rename-in
                      racket/base
                      ;; with zws
                      [#%top #%​top])]
          racket/runtime-path
+
+         scribble/racket
+         scribble/core
+         scribble/decode
          scribble/example]
 
 @(define evaltor ((make-eval-factory '(racket/base cadnr racket/sequence))))
+@(define vv racketvarfont)
+
+@(define symdef-style (make-style "RktSymDef" (list)))
+
+@(define (defcadnr key . str)
+   (define e0 (make-element #f (decode-content str)))
+   (define tag (list 'cadnr key))
+   (define e (make-link-element symdef-style (list e0) tag))
+   (define t (make-target-element #f (list e) tag))
+   (make-index-element
+    #;style #f
+    #;content (list t)
+    #;tag tag
+    #;plain-seq
+    (list (datum-intern-literal
+           (clean-up-index-string (content->string e))))
+    #;entry-seq
+    (list e)
+    #;desc
+    (hash 'kind "cadnr-binding")))
 
 @title{c(a|d)ⁿr}
 
@@ -55,7 +80,7 @@ to an expression as described, otherwise it expands to the
 The patterns are as follows:
 
 @(itemlist
-  @item{@racket[#px"c([ad]+)r"]
+  @item{@defcadnr["cadnr"]{@racket[#px"c([ad]+)r"]}
                (e.g. @racket[caaaaaaddddr], @racket[cdaddadar])
 
         Extensions of the built-in @racket[caaaar]–@racket[cddddr] family,
@@ -71,7 +96,7 @@ The patterns are as follows:
                   (cadaaaaar '(((((((1) 2) 3) 4) 5) 6) 7))
                   (cadaddr '((a b) (c d) (e f) (g h)))]}
 
-  @item{@racket[#px"([frn]*)(first|rest|next)"]
+  @item{@defcadnr["frnnext"]{@racket[#px"([frn]*)(first|rest|next)"]}
                (e.g. @racket[fffirst], @racket[frest],
                      @racket[nfnext])
 
@@ -88,7 +113,7 @@ The patterns are as follows:
                   (fnfffffirst '(((((((1) 2) 3) 4) 5) 6) 7))
                   (fnfnnext '((a b) (c d) (e f) (g h)))]}
 
-  @item{@racket[#px"suc(c*)"]
+  @item{@defcadnr["succc"]{@racket[#px"suc(c*)"]}
                (e.g. @racket[suc], @racket[succ],
                      @racket[succcccccc])
 
@@ -102,7 +127,7 @@ The patterns are as follows:
                   (suc 10)
                   (succccccccc 1)]}
 
-  @item{@racket[#px"pre(d+)"]
+  @item{@defcadnr["preddd"]{@racket[#px"pre(d+)"]}
                (e.g. @racket[pred], @racket[predddd])
 
         Extensions of the predecessor function (called @racket[sub1] in Racket).
@@ -114,7 +139,7 @@ The patterns are as follows:
                   (pred 10)
                   (predddddddd 100)]}
 
-  @item{@racket[#px"add(\\d+)"]
+  @item{@defcadnr["addN"]{@racket[#px"add(\\d+)"]}
                (e.g. @racket[add123], @racket[add37949])
 
         Extensions of @racket[add1], but for any natural number.
@@ -123,7 +148,7 @@ The patterns are as follows:
                   (add256 10)
                   (map add64 '(1 2 5 10 32))]}
 
-  @item{@racket[#px"sub(\\d+)"]
+  @item{@defcadnr["subN"]{@racket[#px"sub(\\d+)"]}
                (e.g. @racket[sub123], @racket[sub37949])
 
         Extensions of @racket[sub1], but for any natural number.
@@ -132,8 +157,8 @@ The patterns are as follows:
                   (sub256 500)
                   (map sub64 '(1 2 5 10 32))]}
 
-  @item{@racket[#px"$NUMBER"]
-               (e.g. @racket[five], @racket[five-hundred-and-twelve])
+  @item{@defcadnr["number"]{@tt{@vv{number}}}
+           (e.g. @racket[five], @racket[five-hundred-and-twelve])
 
         An English-language number.
 
@@ -160,8 +185,8 @@ The patterns are as follows:
 
                   (pengő->forint seventy-six-septillion)]}
 
-  @item{@racket[#px"($NUMBER)\\?"]
-               (e.g. @racket[five?], @racket[nine-hundred-and-ninety-nine?])
+  @item{@defcadnr["number?"]{@tt{@vv{number}?}}
+           (e.g. @racket[five?], @racket[nine-hundred-and-ninety-nine?])
 
         Extensions of @racket[zero?].
 
@@ -173,8 +198,8 @@ The patterns are as follows:
                   (define not-found-response (http-response 404))
                   (four-oh-four? (http-response-status not-found-response))]}
 
-  @item{@racket[#px"($NUMBER)th"]
-               (e.g. @racket[twentieth], @racket[fifty-fifth])
+  @item{@defcadnr["numberth"]{@tt{@vv{number}th}}
+           (e.g. @racket[twentieth], @racket[fifty-fifth])
 
         Extensions of @racket[first]–@racket[fifteenth], finally
         future-proofing @hyperlink["https://con.racket-lang.org/"]{RacketCon}.
@@ -191,14 +216,34 @@ The patterns are as follows:
                   (define letters (string->list "abcdefghijklmnopqrstuvwxyz"))
                   (twenty-third letters)]}
 
-  @item{@racket[#px"sequence-($NUMBER)th"]
-               (e.g. @racket[sequence-twentieth], @racket[sequence-fifty-fifth])
+  @item{@defcadnr["type-numberth"]{@tt{@vv{type}-@vv{number}th}},
+        @defcadnr["type-last"]{@tt{@vv{type}-last}},
+        @defcadnr["type-empty?"]{@tt{@vv{type}-empty?}}
+        @defcadnr["non-empty-type?"]{@tt{non-empty-@vv{type}?}}
+        (e.g. @racket[flvector-fifteenth])
 
-        Extensions of @racket[first]–@racket[fifteenth], but using @racket[sequence-ref].
+        Extensions of @racketmodname[racket/list] and @racket[non-empty-string?]
+        for arbitrary container types.
+
+        These work by referencing bindings derived from @vv{type}. As such,
+        a binding for @tt{@vv{type}?} must be in scope, in addition to:
+
+        @(itemlist
+          @item{For @tt{@vv{type}-@vv{number}th}: @tt{@racketvarfont{type}-ref}}
+          @item{For @tt{@vv{type}-last}: @tt{@racketvarfont{type}-ref} and @tt{@racketvarfont{type}-length}}
+          @item{For @tt{@vv{type}-empty?} and @tt{non-empty-@vv{type}?}: @tt{@racketvarfont{type}-length}})
 
         @examples[#:eval evaltor
                   (sequence-twenty-second (in-naturals 1))
-                  (sequence-sixty-fifth (sequence-map integer->char (in-naturals 1)))]})}
+                  (sequence-sixty-fifth (sequence-map integer->char (in-naturals 1)))
+                  (string-tenth "abcdefghijklmnopqrstuvwxyz")
+                  (vector-last (vector 1 2 3))
+                  (non-empty-list? null)
+                  (eval:error stream-fifth)
+                  (require racket/stream)
+                  (stream-fifth (stream 1 2 3 4 5 6))
+                  (require racket/flonum)
+                  (flvector-empty? (flvector))]})}
 
 @section{Composable c(a|d)ⁿr}
 

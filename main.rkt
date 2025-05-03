@@ -111,4 +111,15 @@
   (check-equal? nineteen-oh-five 1905)
   (check-equal? twenty-one-oh-eight 2108)
 
+  (check-equal? (vector-last (vector 1 2 3 4)) 4)
+  (check-equal? (vector-second (vector 1 2)) 2)
+  (check-equal? (bytes-last #"abcd") 100)
+
+  (check-equal? (string-last "abcdef") #\f)
+  (check-true (string-empty? ""))
+
+  (check-false (non-empty-list? null))
+  (check-false (non-empty-list? #f))
+  (check-true (non-empty-list? (list 1)))
+
   )

@@ -39,7 +39,7 @@
    ["zero" 0] ["and" 'and] ["oh" 'oh]
 
    ["one" "first" 1] ["two" "second" 2] ["three" "third" 3] ["four" 4]
-   ["five" "fifth" 5] ["six" 6] ["seven" 7] ["eight" 8] ["nine" "ninth" 9]
+   ["five" "fifth" 5] ["six" 6] ["seven" 7] ["eight" "eighth" 8] ["nine" "ninth" 9]
    ["ten" 10] ["eleven" 11] ["twelve" "twelfth" 12] ["thirteen" 13] ["fourteen" 14]
    ["fifteen" 15] ["sixteen" 16] ["seventeen" 17] ["eighteen" 18] ["nineteen" 19]
    ["twenty" "twentieth" 20] ["thirty" "thirtieth" 30] ["forty" "fortieth" 40] ["fifty" "fiftieth" 50]
@@ -61,7 +61,7 @@
   (hash-ref word-table tok #f))
 
 (define (tokenize s)
-  (match (regexp-match #px"(.*?)([a-z]+(?:-[a-z]+)*)(.*)" s)
+  (match (regexp-match #px"^(.*?[^a-z-]|)([a-z]+(?:-[a-z]+)*)([^a-z-].*|)$" s)
     [(list _ untok-pfx tokenizable untok-sfx)
      (define (join-or-empty fmt toks)
        (if (null? toks)
