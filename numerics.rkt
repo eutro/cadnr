@@ -75,7 +75,7 @@
         (values toks
                 (string-append untok-pfx (join-or-empty "~a-" pfx))
                 (string-append (join-or-empty "-~a" sfx) untok-sfx))])]
-    [_ (values null s)]))
+    [_ (values null s "")]))
 
 (define-match-expander <=?
   (syntax-parser
