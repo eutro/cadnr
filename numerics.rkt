@@ -6,6 +6,8 @@
          syntax/parse/define
          (for-syntax racket/base))
 
+(require "chinese.rkt")
+
 (provide words->number)
 
 (struct word (cardinal ordinal value))
@@ -192,6 +194,9 @@
 
 ;; Split s into (list prefix number suffix)
 (define (words->number s #:ordinal? [ordinal? #f])
-  (define-values (tokens pfx sfx) (tokenize s))
-  (define num (tokens->number tokens ordinal?))
-  (if num (list pfx num sfx) #f))
+  (define chinese-number (chinese-numeral->number s #:ordinal? ordinal?))
+  (or chinese-number
+      (let ()
+        (define-values (tokens pfx sfx) (tokenize s))
+        (define num (tokens->number tokens ordinal?))
+        (if num (list pfx num sfx) #f))))
