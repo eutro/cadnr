@@ -125,7 +125,7 @@
       [else
        (define c (string-ref s i))
        (if (equal? c #\-)
-           (cons (substring s 0 (add1 i)) (substring s (add1 i)))
+           (values (substring s 0 (add1 i)) (substring s (add1 i)))
            (loop (add1 i)))])))
 
 (define (string-maybe-trim-question-mark s)
