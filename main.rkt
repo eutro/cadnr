@@ -93,6 +93,12 @@
   (check-equal? seventy-six-septillion
                 seventy-six-million-billion-billion)
 
+  (check-equal? 十一万四千五百一十四 114514)
+  (check-equal? 一百九十一万九千八百一十 1919810)
+  (check-true (二百五十八? 258))
+  (check-equal? (第十 racketcon) 10)
+  (check-equal? (sequence-第九千九百九十九 (in-naturals 1)) 9999)
+  
   (define (adópengő->forint ap)
     (/ ap two-hundred-million))
 
