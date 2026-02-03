@@ -216,7 +216,44 @@ The patterns are as follows:
                   (define letters (string->list "abcdefghijklmnopqrstuvwxyz"))
                   (twenty-third letters)]}
 
+  @item{@defcadnr["数字"]{@tt{@vv{数字}}}
+           (e.g. @racket[五], @racket[五百二十])
+        
+        A Chinese-language number.
+        
+        The syntax includes Chinese number, positive or non-positive.
+        Currently names of years (e.g. 一九八四) and large number from
+        亿 upwards (兆, 京, etc.) are not supported.
+        
+        @examples[#:eval evaltor
+                  四
+                  一万零八十六
+                  十一万四千五百一十四
+                  一百九十一万九千八百一十
+                  负一
+                  零
+                  (eval:error 负零)]}
+
+  @item{@defcadnr["数字?"]{@tt{@vv{数字}?}}
+           (e.g. @racket[五?], @racket[九百九十九?])
+
+        Extensions of @racket[zero?].
+
+        @examples[#:eval evaltor
+                  (二? 2)
+                  (九百八十四? 2026)]}
+
+  @item{@defcadnr["第数字"]{@tt{第@vv{数字}}}
+           (e.g. @racket[第二十], @racket[第五十五])
+
+        Extensions of @racket[first]–@racket[fifteenth].
+
+        @examples[#:eval evaltor
+                  (第二十 RacketCon)
+                  (第九百九十九 RacketCon)]}
+
   @item{@defcadnr["type-numberth"]{@tt{@vv{type}-@vv{number}th}},
+        @defcadnr["type-第数字"]{@tt{@vv{type}-第@vv{数字}}},
         @defcadnr["type-last"]{@tt{@vv{type}-last}},
         @defcadnr["type-empty?"]{@tt{@vv{type}-empty?}}
         @defcadnr["non-empty-type?"]{@tt{non-empty-@vv{type}?}}
@@ -237,6 +274,7 @@ The patterns are as follows:
                   (sequence-twenty-second (in-naturals 1))
                   (sequence-sixty-fifth (sequence-map integer->char (in-naturals 1)))
                   (string-tenth "abcdefghijklmnopqrstuvwxyz")
+                  (string-第十 "abcdefghijklmnopqrstuvwxyz")
                   (vector-last (vector 1 2 3))
                   (non-empty-list? null)
                   (eval:error stream-fifth)
