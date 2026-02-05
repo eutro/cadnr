@@ -45,8 +45,8 @@
       [(list* _ 位权 _) #:when (nxor has-preceding-zero? (< (/ last-位权 位权) 100)) #f]
       [(list n 位权) (* n 位权)]
       [(list* n 位权 rest)
-       (define foo (parse-positive-chinese-number-under-10000 rest 位权))
-       (and foo (+ (* n 位权) foo))])))
+       (define rest-number (parse-positive-chinese-number-under-10000 rest 位权))
+       (and rest-number (+ (* n 位权) rest-number))])))
 
 (define (sorted? lst cmp)
   (let loop ([lst lst])

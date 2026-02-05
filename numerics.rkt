@@ -195,8 +195,9 @@
 ;; Split s into (list prefix number suffix)
 (define (words->number s #:ordinal? [ordinal? #f])
   (define chinese-number (chinese-numeral->number s #:ordinal? ordinal?))
-  (or chinese-number
-      (let ()
-        (define-values (tokens pfx sfx) (tokenize s))
-        (define num (tokens->number tokens ordinal?))
-        (if num (list pfx num sfx) #f))))
+  (cond
+    [chinese-number chinese-number]
+    [else
+     (define-values (tokens pfx sfx) (tokenize s))
+     (define num (tokens->number tokens ordinal?))
+     (if num (list pfx num sfx) #f)]))
