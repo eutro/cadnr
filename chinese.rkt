@@ -97,12 +97,13 @@
            digit-value
            (loop (add1 i) (cons digit-value number-under-10000) acc))])])))
 
-(define (parse-chinese-number s)
+(define (parse-chinese-number s must-be-positive?)
   (and
    (> (string-length s) 0)
    (let ([first-char-is-负? (equal? (string-ref s 0) #\负)])
      (cond
-       [(member s '("〇" "零")) 0]
+       [(member s '("〇" "零")) (if must-be-positive? #f 0)]
+       [(and first-char-is-负? must-be-positive?) #f]
        [first-char-is-负?
         (define substring1 (substring s 1))
         (and (not (equal? substring1 "零")) (- (parse-positive-chinese-number substring1)))]
@@ -113,20 +114,16 @@
    (> (string-length s) 0)
    (let ([first-char-is-第? (equal? (string-ref s 0) #\第)])
      (cond
-     [(and first-char-is-第? ordinal?) (parse-chinese-number (substring s 1))]
-     [(and first-char-is-第? (not ordinal?)) #f]
-     [else (parse-chinese-number s)]))))
+       [(and first-char-is-第? ordinal?) (parse-chinese-number (substring s 1) ordinal?)]
+       [(and first-char-is-第? (not ordinal?)) #f]
+       [else (parse-chinese-number s ordinal?)]))))
 
-(define (string-split-on-first-hyphen s)
-  (define len (string-length s))
-  (let loop ([i 0])
+(define (string-split-on-last-hyphen s)
+  (let loop ([i (sub1 (string-length s))])
     (cond
-      [(= i len) (values s "")]
-      [else
-       (define c (string-ref s i))
-       (if (equal? c #\-)
-           (values (substring s (add1 i)) (substring s 0 (add1 i)))
-           (loop (add1 i)))])))
+      [(= i -1) (values s "")]
+      [(equal? (string-ref s i) #\-) (values (substring s (add1 i)) (substring s 0 (add1 i)))]
+      [else (loop (sub1 i))])))
 
 (define (string-maybe-trim-question-mark s)
   (define len (string-length s))
@@ -136,7 +133,7 @@
     [else (values s "")]))
 
 (define (chinese-numeral->number s #:ordinal? [ordinal? #t])
-  (let*-values ([(s pfx) (string-split-on-first-hyphen s)]
+  (let*-values ([(s pfx) (string-split-on-last-hyphen s)]
                 [(s sfx) (string-maybe-trim-question-mark s)]
                 [(n) (parse-chinese-number-maybe-ordinal s ordinal?)])
     (and n (list pfx n sfx))))

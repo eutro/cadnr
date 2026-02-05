@@ -128,4 +128,13 @@
   (check-false (non-empty-list? #f))
   (check-true (non-empty-list? (list 1)))
 
+  (define (mutable-list? obj)
+    (or (null? obj) (and (mpair? obj) (mutable-list? (mcdr obj)))))
+  (define (mutable-list-ref mlist i)
+    (unless (mpair? mlist)
+      (raise-type-error 'mlist "mutable-list" mlist))
+    (if (= i 0) (mcar mlist) (mutable-list-ref (mcdr mlist) (sub1 i))))
+  
+  (check-equal? (mutable-list-第三 (mcons 1 (mcons 1 (mcons 4 null)))) 4)
+
   )
